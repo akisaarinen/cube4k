@@ -151,7 +151,6 @@ var initShaders = function()
   fShader = gpu.loadShader(gl.FRAGMENT_SHADER, "shade_frag");
   gpuShade = gpu.newProgram(vShader, fShader);
 
-  hNormalMatrix = gl.getUniformLocation(gpuShade, "gNormalMatrix");
   hLightPos     = gl.getUniformLocation(gpuShade, "gLightPos");
 
   hRotate    = gl.getUniformLocation(gpuShade, "gRotate");
@@ -166,29 +165,10 @@ function drawPicture(gl)
 {
   gl.viewport(0,0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  setProjection();
-  setViewpoint();
   drawWorld();
   requestAnimationFrame(function() { drawPicture(gl); });
 }
 
-
-function setProjection() {
-  pMatrix = new Float32Array(
-  [1.299038052558899, 0, 0, 0, 
-   0, 1.7320507764816284, 0, 0, 
-   0, 0, -1.0202020406723022, -1, 
-   0, 0, -0.20202019810676575, 0]);
-}
-
-function setViewpoint() {
-  mvMatrix = new Float32Array(
-    [1, 0, 0, 0, 
-    0, 0.8944271802902222, 0.4472135901451111, 0, 
-    0, -0.4472135901451111, 0.8944271802902222, 0, 
-    0, 0, -4.4721360206604, 1]
-  );
-}
 
 var cubeVerts = new Float32Array([
     -0.5,  0.5,  0.5,   // 0
@@ -275,18 +255,7 @@ var myCube = function()
 function drawWorld() {
   gl.useProgram(gpuShade);
 
-  var rotationMatrix = new Float32Array([
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1
-  ]);
-  
-  var translateVector = new Float32Array([0, 0, 0]);
-
-  gl.uniformMatrix3fv(hRotate, false, rotationMatrix);
   gl.uniform1f(hAngleX, currentAngle / 2.0 / Math.PI);
-  gl.uniform3fv(hTranslate, translateVector);
-
   gl.uniform4f(hLightPos, 0.5, 1.0, 1.0, 0.0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
