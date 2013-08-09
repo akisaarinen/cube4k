@@ -8,11 +8,10 @@
     
     uniform mat3 gRotate;
     uniform vec3 gTranslate;
-    
     uniform vec4 gLightPos;
-    uniform vec4 gColor;
-
     uniform float gAngleX;
+
+    vec4 cubeColor = vec4(0, 1, 0, 1);
 
     mat4 viewpoint = mat4(
       1, 0, 0, 0, 
@@ -110,7 +109,7 @@
         lightDir = normalize(gLightPos - eyePos);
         NdotL = max(dot(eyeNorm.xyz, lightDir.xyz), 0.0);
         
-        fColor = vec4(gColor.rgb * NdotL, 1);
+        fColor = vec4(cubeColor.rgb * NdotL, 1);
         
         pos = vec4(vPosition, 1);
         gl_Position = projection * view * pos;
@@ -191,9 +190,6 @@ var initShaders = function()
   hRotate            = gl.getUniformLocation(gpuShade, "gRotate");
   hTranslate         = gl.getUniformLocation(gpuShade, "gTranslate");
   hAngleX         = gl.getUniformLocation(gpuShade, "gAngleX");
-
-  hColor            = gl.getUniformLocation(gpuShade, "gColor");
-  hColor            = gl.getUniformLocation(gpuShade, "gColor");
 
   vaPosition = gl.getAttribLocation(gpuShade, "vPosition");
   vaNormal   = gl.getAttribLocation(gpuShade, "vNormal");
@@ -313,8 +309,6 @@ var myCube = function()
 
 
 function drawWorld() {
-  cubeColor = [0,1,0,1];
-
   gl.useProgram(gpuShade);
 
   var rotationMatrix = new Float32Array([
@@ -330,7 +324,6 @@ function drawWorld() {
   gl.uniform3fv(hTranslate, translateVector);
 
   gl.uniform4f(hLightPos, 0.5, 1.0, 1.0, 0.0);
-  gl.uniform4f(hColor, cubeColor[0], cubeColor[1], cubeColor[2], cubeColor[3]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
         gl.enableVertexAttribArray(vaPosition);
