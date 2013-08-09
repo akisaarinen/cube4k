@@ -4,130 +4,124 @@
 <title>Shader</title>
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 <script id="shade_vert" type="x-shader/x-vertex">
-    precision mediump float;
-    
-    uniform mat3 gRotate;
-    uniform vec3 gTranslate;
-    uniform vec4 gLightPos;
-    uniform float gAngleX;
+precision mediump float;
 
-    vec4 cubeColor = vec4(0, 1, 0, 1);
+uniform mat3 gRotate;
+uniform vec3 gTranslate;
+uniform vec4 gLightPos;
+uniform float gAngleX;
 
-    mat4 viewpoint = mat4(
-      1, 0, 0, 0, 
-      0, 0.8944271802902222, 0.4472135901451111, 0, 
-      0, -0.4472135901451111, 0.8944271802902222, 0, 
-      0, 0, -4.4721360206604, 1
-    );
+vec4 cubeColor = vec4(0, 1, 0, 1);
 
-    mat4 projection = mat4(
-      1.299038052558899, 0, 0, 0, 
-      0, 1.7320507764816284, 0, 0, 
-      0, 0, -1.0202020406723022, -1, 
-      0, 0, -0.20202019810676575, 0
-    );
-    
-    attribute vec3 vPosition;
-    attribute vec3 vNormal;
-    
-    varying vec4 fColor;
+mat4 viewpoint = mat4(
+  1, 0, 0, 0, 
+  0, 0.8944271802902222, 0.4472135901451111, 0, 
+  0, -0.4472135901451111, 0.8944271802902222, 0, 
+  0, 0, -4.4721360206604, 1
+);
 
-    mat4 transpose(mat4 R) {
-      return mat4(
-        R[0][0], R[1][0], R[2][0], R[3][0],
-        R[0][1], R[1][1], R[2][1], R[3][1],
-        R[0][2], R[1][2], R[2][2], R[3][2],
-        R[0][3], R[1][3], R[2][3], R[3][3]
-      );
-    }
+mat4 projection = mat4(
+  1.299038052558899, 0, 0, 0, 
+  0, 1.7320507764816284, 0, 0, 
+  0, 0, -1.0202020406723022, -1, 
+  0, 0, -0.20202019810676575, 0
+);
 
-    mat3 transpose(mat3 R) {
-      return mat3(
-        R[0][0], R[1][0], R[2][0],
-        R[0][1], R[1][1], R[2][1],
-        R[0][2], R[1][2], R[2][2]
-      );
-    }
+attribute vec3 vPosition;
+attribute vec3 vNormal;
 
-    mat4 inverse(mat3 R, vec3 t)
-    {
-      mat3 Rt = transpose(R);
-      vec3 th = Rt*t;
-      return mat4(
-        R[0][0], R[1][0], R[2][0], 0,
-        R[0][1], R[1][1], R[2][1], 0,
-        R[0][2], R[1][2], R[2][2], 0,
-        -th[0],  -th[1],  -th[2],  1
-      );
-    }
+varying vec4 fColor;
 
-    mat3 rotatex(float t) {
-      return mat3(
-          1,      0,       0,
-          0, cos(t), -sin(t),
-          0, sin(t),  cos(t)
-      );
-    }
-    mat3 rotatey(float t) {
-      return mat3(
-         cos(t), 0, sin(t),
-        0,       1,      0,
-        -sin(t), 0, cos(t)
-      );
-    }
-    mat3 rotatez(float t) {
-      return mat3(
-        cos(t), -sin(t), 0,
-        sin(t),  cos(t), 0,
-             0,       0, 1
-      );
-    }
+mat4 transpose(mat4 R) {
+  return mat4(
+    R[0][0], R[1][0], R[2][0], R[3][0],
+    R[0][1], R[1][1], R[2][1], R[3][1],
+    R[0][2], R[1][2], R[2][2], R[3][2],
+    R[0][3], R[1][3], R[2][3], R[3][3]
+  );
+}
 
-    mat4 view4(mat3 M) {
-      return mat4(
-        M[0][0], M[0][1], M[0][2], 0,
-        M[1][0], M[1][1], M[1][2], 0,
-        M[2][0], M[2][1], M[2][2], 0,
-        0, 0, 0, 1
-      );
-    }
-    
-    void main(void)
-    {
-        vec4 eyeNorm, eyePos, lightDir, pos;
-        mat4 dummy;
-        float NdotL, diffuse;
+mat3 transpose(mat3 R) {
+  return mat3(
+    R[0][0], R[1][0], R[2][0],
+    R[0][1], R[1][1], R[2][1],
+    R[0][2], R[1][2], R[2][2]
+  );
+}
 
-        mat3 R = rotatex(gAngleX) * rotatey(gAngleX/2.0);
+mat4 inverse(mat3 R, vec3 t)
+{
+  mat3 Rt = transpose(R);
+  vec3 th = Rt*t;
+  return mat4(
+    R[0][0], R[1][0], R[2][0], 0,
+    R[0][1], R[1][1], R[2][1], 0,
+    R[0][2], R[1][2], R[2][2], 0,
+    -th[0],  -th[1],  -th[2],  1
+  );
+}
 
-        mat4 view = viewpoint * view4(R);
-        mat4 normal = viewpoint * transpose(inverse(R, gTranslate));
+mat3 rotatex(float t) {
+  return mat3(
+    1,      0,       0,
+    0, cos(t), -sin(t),
+    0, sin(t),  cos(t)
+  );
+}
+mat3 rotatey(float t) {
+  return mat3(
+    cos(t), 0, sin(t),
+    0,       1,      0,
+    -sin(t), 0, cos(t)
+  );
+}
+mat3 rotatez(float t) {
+  return mat3(
+    cos(t), -sin(t), 0,
+    sin(t),  cos(t), 0,
+    0,       0, 1
+  );
+}
 
-        eyeNorm = normalize(normal * vec4(vNormal, 0));
-        eyePos  = view * vec4(vPosition, 1);        
-        
-        lightDir = normalize(gLightPos - eyePos);
-        NdotL = max(dot(eyeNorm.xyz, lightDir.xyz), 0.0);
-        
-        fColor = vec4(cubeColor.rgb * NdotL, 1);
-        
-        pos = vec4(vPosition, 1);
-        gl_Position = projection * view * pos;
-    }
+mat4 view4(mat3 M) {
+  return mat4(
+    M[0][0], M[0][1], M[0][2], 0,
+    M[1][0], M[1][1], M[1][2], 0,
+    M[2][0], M[2][1], M[2][2], 0,
+    0, 0, 0, 1
+  );
+}
+
+void main(void)
+{
+  vec4 eyeNorm, eyePos, lightDir, pos;
+  mat4 dummy;
+  float NdotL, diffuse;
+
+  mat3 R = rotatex(gAngleX) * rotatey(gAngleX/2.0);
+
+  mat4 view = viewpoint * view4(R);
+  mat4 normal = viewpoint * transpose(inverse(R, gTranslate));
+
+  eyeNorm = normalize(normal * vec4(vNormal, 0));
+  eyePos  = view * vec4(vPosition, 1);        
+
+  lightDir = normalize(gLightPos - eyePos);
+  NdotL = max(dot(eyeNorm.xyz, lightDir.xyz), 0.0);
+
+  fColor = vec4(cubeColor.rgb * NdotL, 1);
+
+  pos = vec4(vPosition, 1);
+  gl_Position = projection * view * pos;
+}
 </script>
 <script id="shade_frag" type="x-shader/x-fragment">
-    precision mediump float;
-    
-    varying vec4 fColor;
-    varying vec4 bColor;
-    
-    void main(void)
-    {
-        if (gl_FrontFacing)
-            gl_FragColor = fColor;
-        else
-            gl_FragColor = vec4(1,0,0,1);
-    }
+  precision mediump float;
+  varying vec4 fColor;
+  void main(void)
+  {
+      gl_FragColor = fColor;
+  }
 </script>
 <script src="gpu.js"></script>
 <script>
@@ -157,12 +151,12 @@ var initShaders = function()
   fShader = gpu.loadShader(gl.FRAGMENT_SHADER, "shade_frag");
   gpuShade = gpu.newProgram(vShader, fShader);
 
-  hNormalMatrix     = gl.getUniformLocation(gpuShade, "gNormalMatrix");
-  hLightPos         = gl.getUniformLocation(gpuShade, "gLightPos");
+  hNormalMatrix = gl.getUniformLocation(gpuShade, "gNormalMatrix");
+  hLightPos     = gl.getUniformLocation(gpuShade, "gLightPos");
 
-  hRotate            = gl.getUniformLocation(gpuShade, "gRotate");
-  hTranslate         = gl.getUniformLocation(gpuShade, "gTranslate");
-  hAngleX         = gl.getUniformLocation(gpuShade, "gAngleX");
+  hRotate    = gl.getUniformLocation(gpuShade, "gRotate");
+  hTranslate = gl.getUniformLocation(gpuShade, "gTranslate");
+  hAngleX    = gl.getUniformLocation(gpuShade, "gAngleX");
 
   vaPosition = gl.getAttribLocation(gpuShade, "vPosition");
   vaNormal   = gl.getAttribLocation(gpuShade, "vNormal");
