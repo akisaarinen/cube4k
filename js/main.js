@@ -15,7 +15,6 @@ function start() {
   drawPicture(gl);
 }
 
-
 var loadShader = function(shaderType, id) {
   var src = document.getElementById(id).textContent;
   var s = gl.createShader(shaderType);
@@ -67,7 +66,33 @@ function drawPicture(gl)
   requestAnimationFrame(function() { drawPicture(gl); });
 }
 
+var ur = function(v,d) {
+  var result = [];
+  var i = -1;
+  while(++i<d.length) {
+    for(var j=0;j<d[i];j++) {
+      result.push(v);
+    }
+    v=-v;
+  }
+  return result;
+}
 
+var zip3 = function(a,b,c) {
+  var x = [];
+  for (var i=0;i<a.length; i++) {
+    x.push(a[i], b[i], c[i]);
+  }
+  return x;
+}
+
+// 3173 bytes @start
+var a = ur(-.5, [2,2,4,1,1,1,1,5,1,1,1,2,2]);
+var b = ur( .5, [1,1,1,1,1,1,1,1,5,1,1,5,1,1,1,1]);
+var c = ur( .5, [4,2,2,2,4,2,2,6]);
+var cubeVerts = new Float32Array(zip3(a,b,c));
+
+/*
 var cubeVerts = new Float32Array([
     -0.5,  0.5,  0.5,   // 0
     -0.5, -0.5,  0.5,
@@ -94,6 +119,7 @@ var cubeVerts = new Float32Array([
     -0.5,  0.5, -0.5,
     -0.5, -0.5, -0.5,
 ]);
+*/
 
 var cubeNorms = new Float32Array([
      0,  0,  1,
