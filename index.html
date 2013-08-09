@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Shader</title>
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 <script id="shade_vert" type="x-shader/x-vertex">
 precision mediump float;
 
-uniform mat3 gRotate;
-uniform vec3 gTranslate;
-uniform float gAngleX;
-
+uniform float X;
 vec4 cubeColor = vec4(0, 1, 0, 1);
 
 mat4 viewpoint = mat4(
@@ -99,17 +95,15 @@ void main(void)
   mat4 dummy;
   float NdotL, diffuse;
 
-  mat3 R = rotatex(gAngleX) * rotatey(gAngleX/2.0);
+  mat3 R = rotatex(X) * rotatey(X/2.0);
 
   mat4 view = viewpoint * view4(R);
-  mat4 normal = viewpoint * transpose(inverse(R, gTranslate));
+  mat4 normal = viewpoint * transpose(inverse(R, vec3(0,0,0)));
 
   eyeNorm = normalize(normal * vec4(vNormal, 0));
   eyePos  = view * vec4(vPosition, 1);        
-
   lightDir = normalize(lightPos - eyePos);
   NdotL = max(dot(eyeNorm.xyz, lightDir.xyz), 0.0);
-
   fColor = vec4(cubeColor.rgb * NdotL, 1);
 
   pos = vec4(vPosition, 1);
@@ -126,4 +120,4 @@ void main(void)
 </script>
 <!--<script src="dist/Cube.min.js"></script>-->
 <script src="js/main.js"></script>
-</head><body onload="start()"><canvas id="glcanvas" width="640" height="480"></canvas></body></html>
+</head><body onload="start()"><canvas id="c" width="640" height="480"></canvas></body></html>

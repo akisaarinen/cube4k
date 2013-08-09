@@ -1,18 +1,22 @@
 function start() {
-  var canvas = document.getElementById("glcanvas");
+  var canvas = document.getElementById("c");
   gl = canvas.getContext("webgl");
 
   gl.viewportWidth = canvas.width;
   gl.viewportHeight = canvas.height;
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  //gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
-  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  //gl.depthFunc(gl.LEQUAL);
+  //gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
-  prog = initShaders();
-  myCube();
-  drawPicture(gl);
+  initShaders();
+
+  cubeVBuf = create(gl.ARRAY_BUFFER, cubeVerts);
+  cubeNBuf = create(gl.ARRAY_BUFFER, cubeNorms);
+  cubeIdxBuf = create(gl.ELEMENT_ARRAY_BUFFER, cubeIdx);
+
+  D();
 }
 
 var loadShader = function(shaderType, id) {
@@ -20,19 +24,23 @@ var loadShader = function(shaderType, id) {
   var s = gl.createShader(shaderType);
   gl.shaderSource(s, src);
   gl.compileShader(s);
+  /*
   if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
     console.error("compile: '" + id + "': " + gl.getShaderInfoLog(s));
   }
+  */
   return s;
 }
 
 var createProgram = function(vertexId, fragmentId) {
   var v = loadShader(gl.VERTEX_SHADER, vertexId);
   var f = loadShader(gl.FRAGMENT_SHADER, fragmentId);
-  var p = gl.createProgram();
-  gl.attachShader(p,v);
-  gl.attachShader(p,f);
-  gl.linkProgram(p);
+
+  P = gl.createProgram();
+  gl.attachShader(P,v);
+  gl.attachShader(P,f);
+  gl.linkProgram(P);
+  /*
   if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
     console.error("link: " + gl.getProgramInfoLog(p));
   }
@@ -40,29 +48,39 @@ var createProgram = function(vertexId, fragmentId) {
   if (!gl.getProgramParameter(p, gl.VALIDATE_STATUS)) {
     console.error("validate: " + gl.getProgramInfoLog(p));
   }
-  return p;
+  */
 }
 
 var initShaders = function()
 {
-  var p = createProgram("shade_vert", "shade_frag");
+  createProgram("shade_vert", "shade_frag");
 
-  hRotate    = gl.getUniformLocation(p, "gRotate");
-  hTranslate = gl.getUniformLocation(p, "gTranslate");
-  hAngleX    = gl.getUniformLocation(p, "gAngleX");
-
-  vaPosition = gl.getAttribLocation(p, "vPosition");
-  vaNormal   = gl.getAttribLocation(p, "vNormal");
-
-  return p;
+  X  = gl.getUniformLocation(P, "X");
+  vP = gl.getAttribLocation(P, "vPosition");
+  vN = gl.getAttribLocation(P, "vNormal");
 };
 
-function drawPicture(gl)
+function D()
 {
   gl.viewport(0,0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  drawWorld();
-  requestAnimationFrame(function() { drawPicture(gl); });
+
+  gl.useProgram(P);
+
+  gl.uniform1f(X, A / 2.0 / Math.PI);
+
+  bind(cubeVBuf, vP);
+  bind(cubeNBuf, vN);
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
+  gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
+
+  A += 0.45;
+  if (A > 360) {
+    A -= 360;
+  }
+
+  requestAnimationFrame(function() { D(); });
 }
 
 /*
@@ -190,47 +208,20 @@ var cubeIdx = new Uint16Array([
     20, 21, 22, 21, 23, 22,
 ]);
 
-var myCube = function()
-{
-  cubeVBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, cubeVerts, gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-  cubeNBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, cubeNorms, gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-  cubeIdxBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIdx, gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-};
-
-
-function drawWorld() {
-  gl.useProgram(prog);
-
-  gl.uniform1f(hAngleX, currentAngle / 2.0 / Math.PI);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
-  gl.enableVertexAttribArray(vaPosition);
-  gl.vertexAttribPointer(vaPosition, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
-  gl.enableVertexAttribArray(vaNormal);
-  gl.vertexAttribPointer(vaNormal, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-  gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
-
-  currentAngle += 0.45;
-  if (currentAngle > 360) {
-    currentAngle -= 360;
-  }
+function create(kind, verts) {
+  var x = gl.createBuffer();
+  gl.bindBuffer(kind, x);
+  gl.bufferData(kind, verts, gl.STATIC_DRAW);
+  gl.bindBuffer(kind, null);
+  return x;
 }
 
-currentAngle = 0.0;
-incAngle = 0.1;
+function bind(buffer, uniform) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.enableVertexAttribArray(uniform);
+  gl.vertexAttribPointer(uniform, 3, gl.FLOAT, false, 0, 0);
+}
+
+A = 0.0;
+Ai = 0.1;
 
