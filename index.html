@@ -115,33 +115,7 @@
         gl_Position = projection * view * pos;
     }
 </script>
-<!--
-      M = {
-        {R11, R12, R13, 0},
-        {R21, R22, R23, 0},
-        {R31, R32, R33, 0},
-        {tx, ty, tz, 1},
-      };
-
-      Rt = {
-        {R11, R21, R31},
-        {R12, R22, R32},
-        {R13, R23, R33}
-      }
-
-      Rt*t = t'
-
-      M-1 = {
-        {R11, R21, R31, 0},
-        {R12, R22, R32, 0},
-        {R13, R23, R33, 0},
-        {-t'x, -t'y, -t'z, 1},
-      };
-      -->
 <script id="shade_frag" type="x-shader/x-fragment">
-
-    //#version 100
-    // Must specify precision in WebGL frag shaders
     precision mediump float;
     
     varying vec4 fColor;
@@ -149,7 +123,6 @@
     
     void main(void)
     {
-        // Want to see polygons in wrong order
         if (gl_FrontFacing)
             gl_FragColor = fColor;
         else
@@ -166,10 +139,10 @@ function start() {
   gl.viewportWidth = canvas.width;
   gl.viewportHeight = canvas.height;
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);                      // Set clear color to black, fully opaque
-  gl.enable(gl.DEPTH_TEST);                               // Enable depth testing
-  gl.depthFunc(gl.LEQUAL);                                // Near things obscure far things
-  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);      // Clear the color as well as the depth buffer.
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
   initShaders();
   myCube();
@@ -197,7 +170,6 @@ var initShaders = function()
 
 function drawPicture(gl)
 {
-  // Clear the canvas
   gl.viewport(0,0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   setProjection();
@@ -224,7 +196,6 @@ function setViewpoint() {
   );
 }
 
-// Cube geometry
 var cubeVerts = new Float32Array([
     -0.5,  0.5,  0.5,   // 0
     -0.5, -0.5,  0.5,
@@ -290,7 +261,6 @@ var cubeIdx = new Uint16Array([
 
 var myCube = function()
 {
-        // Transfer data to GPU
         cubeVBuf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
         gl.bufferData(gl.ARRAY_BUFFER, cubeVerts, gl.STATIC_DRAW);
