@@ -8,7 +8,6 @@ precision mediump float;
 
 uniform mat3 gRotate;
 uniform vec3 gTranslate;
-uniform vec4 gLightPos;
 uniform float gAngleX;
 
 vec4 cubeColor = vec4(0, 1, 0, 1);
@@ -26,6 +25,8 @@ mat4 projection = mat4(
   0, 0, -1.0202020406723022, -1, 
   0, 0, -0.20202019810676575, 0
 );
+
+vec4 lightPos = vec4(0.5, 1.0, 1.0, 0.0);
 
 attribute vec3 vPosition;
 attribute vec3 vNormal;
@@ -106,7 +107,7 @@ void main(void)
   eyeNorm = normalize(normal * vec4(vNormal, 0));
   eyePos  = view * vec4(vPosition, 1);        
 
-  lightDir = normalize(gLightPos - eyePos);
+  lightDir = normalize(lightPos - eyePos);
   NdotL = max(dot(eyeNorm.xyz, lightDir.xyz), 0.0);
 
   fColor = vec4(cubeColor.rgb * NdotL, 1);

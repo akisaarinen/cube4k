@@ -47,7 +47,6 @@ var initShaders = function()
 {
   var p = createProgram("shade_vert", "shade_frag");
 
-  hLightPos  = gl.getUniformLocation(p, "gLightPos");
   hRotate    = gl.getUniformLocation(p, "gRotate");
   hTranslate = gl.getUniformLocation(p, "gTranslate");
   hAngleX    = gl.getUniformLocation(p, "gAngleX");
@@ -66,6 +65,7 @@ function drawPicture(gl)
   requestAnimationFrame(function() { drawPicture(gl); });
 }
 
+/*
 var ur = function(v,d) {
   var result = [];
   var i = -1;
@@ -92,7 +92,41 @@ var b = ur( .5, [1,1,1,1,1,1,1,1,5,1,1,5,1,1,1,1]);
 var c = ur( .5, [4,2,2,2,4,2,2,6]);
 var cubeVerts = new Float32Array(zip3(a,b,c));
 
-/*
+var gen = function(x,y,l) {
+  var result = [];
+  for (var i=1; i <= l; i++) {
+    result.push((Math.sin(x*i) * Math.cos(y*i + 2*i)) > 0 ? -0.5 : 0.5);
+  }
+  return result;
+}
+
+function deq(a,b) {
+  for(var i=0; i < a.length; i++) {
+    if (a[i] != b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+var seed = 0.32;
+var incr = 2.23;
+for (var i = 0; i < 1000000; i++) {
+  var generated = gen(seed, seed, 72);
+  seed += incr;
+  if (deq(cubeVerts, generated)) {
+    console.log("found! seed: " + seed);
+    alert("found! seed: " + seed);
+    break;
+  }
+  console.log(generated.length);
+  console.log(generated);
+  break;
+}
+console.log("nope..");
+*/
+
 var cubeVerts = new Float32Array([
     -0.5,  0.5,  0.5,   // 0
     -0.5, -0.5,  0.5,
@@ -119,7 +153,6 @@ var cubeVerts = new Float32Array([
     -0.5,  0.5, -0.5,
     -0.5, -0.5, -0.5,
 ]);
-*/
 
 var cubeNorms = new Float32Array([
      0,  0,  1,
@@ -159,20 +192,20 @@ var cubeIdx = new Uint16Array([
 
 var myCube = function()
 {
-        cubeVBuf = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, cubeVerts, gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        
-        cubeNBuf = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, cubeNorms, gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        
-        cubeIdxBuf = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIdx, gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  cubeVBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, cubeVerts, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  cubeNBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, cubeNorms, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  cubeIdxBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIdx, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
 
@@ -180,23 +213,22 @@ function drawWorld() {
   gl.useProgram(prog);
 
   gl.uniform1f(hAngleX, currentAngle / 2.0 / Math.PI);
-  gl.uniform4f(hLightPos, 0.5, 1.0, 1.0, 0.0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
-        gl.enableVertexAttribArray(vaPosition);
-        gl.vertexAttribPointer(vaPosition, 3, gl.FLOAT, false, 0, 0);
-        
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
-        gl.enableVertexAttribArray(vaNormal);
-        gl.vertexAttribPointer(vaNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVBuf);
+  gl.enableVertexAttribArray(vaPosition);
+  gl.vertexAttribPointer(vaPosition, 3, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-    gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
- 
-    currentAngle += 0.45;
-    if (currentAngle > 360) {
-        currentAngle -= 360;
-    }
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeNBuf);
+  gl.enableVertexAttribArray(vaNormal);
+  gl.vertexAttribPointer(vaNormal, 3, gl.FLOAT, false, 0, 0);
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
+  gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
+
+  currentAngle += 0.45;
+  if (currentAngle > 360) {
+    currentAngle -= 360;
+  }
 }
 
 currentAngle = 0.0;
