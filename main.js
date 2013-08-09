@@ -10,27 +10,53 @@ function start() {
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
-  initShaders();
+  prog = initShaders();
   myCube();
   drawPicture(gl);
 }
 
+
+var loadShader = function(shaderType, id) {
+  var src = document.getElementById(id).textContent;
+  var s = gl.createShader(shaderType);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error("compile: '" + id + "': " + gl.getShaderInfoLog(s));
+  }
+  return s;
+}
+
+var createProgram = function(vertexId, fragmentId) {
+  var v = loadShader(gl.VERTEX_SHADER, vertexId);
+  var f = loadShader(gl.FRAGMENT_SHADER, fragmentId);
+  var p = gl.createProgram();
+  gl.attachShader(p,v);
+  gl.attachShader(p,f);
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+    console.error("link: " + gl.getProgramInfoLog(p));
+  }
+  gl.validateProgram(p);
+  if (!gl.getProgramParameter(p, gl.VALIDATE_STATUS)) {
+    console.error("validate: " + gl.getProgramInfoLog(p));
+  }
+  return p;
+}
+
 var initShaders = function()
 {
-  var vShader, fShader;
+  var p = createProgram("shade_vert", "shade_frag");
 
-  vShader = gpu.loadShader(gl.VERTEX_SHADER, "shade_vert");
-  fShader = gpu.loadShader(gl.FRAGMENT_SHADER, "shade_frag");
-  gpuShade = gpu.newProgram(vShader, fShader);
+  hLightPos  = gl.getUniformLocation(p, "gLightPos");
+  hRotate    = gl.getUniformLocation(p, "gRotate");
+  hTranslate = gl.getUniformLocation(p, "gTranslate");
+  hAngleX    = gl.getUniformLocation(p, "gAngleX");
 
-  hLightPos     = gl.getUniformLocation(gpuShade, "gLightPos");
+  vaPosition = gl.getAttribLocation(p, "vPosition");
+  vaNormal   = gl.getAttribLocation(p, "vNormal");
 
-  hRotate    = gl.getUniformLocation(gpuShade, "gRotate");
-  hTranslate = gl.getUniformLocation(gpuShade, "gTranslate");
-  hAngleX    = gl.getUniformLocation(gpuShade, "gAngleX");
-
-  vaPosition = gl.getAttribLocation(gpuShade, "vPosition");
-  vaNormal   = gl.getAttribLocation(gpuShade, "vNormal");
+  return p;
 };
 
 function drawPicture(gl)
@@ -125,7 +151,7 @@ var myCube = function()
 
 
 function drawWorld() {
-  gl.useProgram(gpuShade);
+  gl.useProgram(prog);
 
   gl.uniform1f(hAngleX, currentAngle / 2.0 / Math.PI);
   gl.uniform4f(hLightPos, 0.5, 1.0, 1.0, 0.0);
