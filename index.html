@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Shader</title>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+<script id="vshader" type="x-shader/x-vertex">
+    uniform mat4 u_modelViewProjMatrix;
+    uniform mat4 u_normalMatrix;
+    uniform vec3 lightDir;
+ 
+    attribute vec3 vNormal;
+    attribute vec4 vTexCoord;
+    attribute vec4 vPosition;
+ 
+    varying float v_Dot;
+    varying vec2 v_texCoord;
+ 
+    void main()
+    {
+        gl_Position = u_modelViewProjMatrix * vPosition;
+        v_texCoord = vTexCoord.st;
+        vec4 transNormal = u_normalMatrix * vec4(vNormal, 1);
+        v_Dot = max(dot(transNormal.xyz, lightDir), 0.0);
+    }
+</script>
+<script id="fshader" type="x-shader/x-fragment">
+    precision mediump float;
+ 
+    uniform sampler2D sampler2d;
+ 
+    varying float v_Dot;
+    varying vec2 v_texCoord;
+ 
+    void main()
+    {
+        if (gl_FrontFacing) {
+          vec2 texCoord = vec2(v_texCoord.s, 1.0 - v_texCoord.t);
+          vec4 color = texture2D(sampler2d, texCoord);
+          color += vec4(0.1, 0.1, 0.1, 1);
+          gl_FragColor = vec4(color.xyz * v_Dot, color.a);
+          gl_FragColor = vec4(color.xyz, color.a);
+        } else {
+          gl_FragColor = vec4(1,0,0,1);
+        }
+    }
+</script>
+<script src="webgl-utils.js"></script>
+<script src="J3DI.js"></script>
+<script src="J3DIMath.js"></script>
+<script>
+function start() {
+  gl = initWebGL("glcanvas");      // Initialize the GL context
+  if (gl) {
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);                      // Set clear color to black, fully opaque
+    gl.enable(gl.DEPTH_TEST);                               // Enable depth testing
+    gl.depthFunc(gl.LEQUAL);                                // Near things obscure far things
+    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);      // Clear the color as well as the depth buffer.
+  }
+
+  g = {};
+  g.program = simpleSetup(
+          gl, "vshader", "fshader", 
+          [ "vNormal", "vColor", "vPosition"], 
+          [ 0, 0, 0, 1 ], 
+          10000);
+
+  gl.uniform3f(gl.getUniformLocation(g.program, "lightDir"), 0, 0, 1);
+  gl.uniform1i(gl.getUniformLocation(g.program, "sampler2d"), 0);
+
+  
+    // Create a box. with the BufferObjects containing the arrays 
+    // for vertices, normals, texture coords, and indices.
+    g.box = makeBox(gl);
+ 
+    // Load an image to use. Returns a WebGLTexture object
+    spiritTexture = loadImageTexture(gl, "resources/spirit.jpg");
+ 
+    // Create some matrices to use later and save their locations in the shaders
+    g.mvMatrix = new J3DIMatrix4();
+    g.u_normalMatrixLoc = gl.getUniformLocation(g.program, "u_normalMatrix");
+    g.normalMatrix = new J3DIMatrix4();
+    g.u_modelViewProjMatrixLoc = gl.getUniformLocation(g.program, "u_modelViewProjMatrix");
+    g.mvpMatrix = new J3DIMatrix4();
+ 
+    // Enable all of the vertex attribute arrays.
+    gl.enableVertexAttribArray(0);
+    gl.enableVertexAttribArray(1);
+    gl.enableVertexAttribArray(2);
+ 
+    // Set up all the vertex attributes for vertices, normals and texCoords
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.box.vertexObject);
+    gl.vertexAttribPointer(2, 3, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.box.normalObject);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+ 
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.box.texCoordObject);
+    gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
+ 
+    // Bind the index array
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.box.indexObject);
+
+   reshape(gl);
+}
+
+reshaped = true;
+
+function reshape(gl)
+{
+    // if the display size of the canvas has changed
+    // change the size we render at to match.
+    var canvas = document.getElementById('glcanvas');
+    if (reshaped && canvas.clientWidth == canvas.width && canvas.clientHeight == canvas.height) {
+        return;
+    }
+    reshaped = true;
+ 
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+ 
+    // Set the viewport and projection matrix for the scene
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+    g.perspectiveMatrix = new J3DIMatrix4();
+    g.perspectiveMatrix.lookat(0, 0, 7, 0, 0, 0, 0, 1, 0);
+    g.perspectiveMatrix.perspective(30, canvas.clientWidth / canvas.clientHeight, 1, 10000);
+}
+
+function drawPicture(gl)
+{
+    //Make sure the canvas is sized correctly.
+    reshape(gl);
+ 
+    // Clear the canvas
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+ 
+    // Make a model/view matrix.
+    g.mvMatrix.makeIdentity();
+    g.mvMatrix.translate(0, 0, 0);
+    g.mvMatrix.rotate(currentAngle, 0, 10, 0);
+ 
+    // Construct the normal matrix from the model-view matrix and pass it in
+    g.normalMatrix.load(g.mvMatrix);
+    g.normalMatrix.invert();
+    g.normalMatrix.transpose();
+    g.normalMatrix.setUniform(gl, g.u_normalMatrixLoc, false);
+ 
+    // Construct the model-view * projection matrix and pass it in
+    g.mvpMatrix.load(g.perspectiveMatrix);
+    g.mvpMatrix.multiply(g.mvMatrix);
+    g.mvpMatrix.setUniform(gl, g.u_modelViewProjMatrixLoc, false);
+ 
+    // Bind the texture to use
+    gl.bindTexture(gl.TEXTURE_2D, spiritTexture);
+ 
+    // Draw the cube
+    gl.drawElements(gl.TRIANGLES, g.box.numIndices, gl.UNSIGNED_BYTE, 0);
+ 
+    currentAngle += incAngle;
+    if (currentAngle > 360) {
+        currentAngle -= 360;
+    }
+    requestAnimationFrame(function() { drawPicture(gl); });
+}
+
+currentAngle = 0.0;
+incAngle = 0.1;
+requestAnimationFrame(function() { drawPicture(gl); });
+</script>
+</head>
+<body onload="start()">
+<canvas id="glcanvas" width="640" height="480"></canvas>
+</body>
+</html>
