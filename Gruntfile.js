@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      files: ['<%= jshint.files %>'],
+      files: ['js/*.js'],
       tasks: ['concat', 'uglify']
     }
   });
