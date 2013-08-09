@@ -148,7 +148,6 @@
     }
 </script>
 <script src="gpu.js"></script>
-<script src="glDegMatrix.js"></script>
 <script>
 
 function start() {
@@ -162,9 +161,6 @@ function start() {
   gl.enable(gl.DEPTH_TEST);                               // Enable depth testing
   gl.depthFunc(gl.LEQUAL);                                // Near things obscure far things
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);      // Clear the color as well as the depth buffer.
-
-  mat4.identity(pMatrix);
-  mat4.identity(mvMatrix);
 
   initShaders();
   myCube();
@@ -207,11 +203,7 @@ function drawPicture(gl)
 }
 
 
-var pMatrix = mat4.create();
-var mvMatrix = mat4.create();
-
 function setProjection() {
-  //mat4.perspective(60, gl.viewportWidth / gl.viewportHeight, 0.1, 10, pMatrix);
   pMatrix = new Float32Array(
   [1.299038052558899, 0, 0, 0, 
    0, 1.7320507764816284, 0, 0, 
@@ -220,7 +212,6 @@ function setProjection() {
 }
 
 function setViewpoint() {
-  //mat4.lookAt([0, 2, 4], [0,0,0], [0,1,0], mvMatrix);
   mvMatrix = new Float32Array(
     [1, 0, 0, 0, 
     0, 0.8944271802902222, 0.4472135901451111, 0, 
@@ -313,62 +304,7 @@ var myCube = function()
 };
 
 
-var mat4rotate = function(mat, angle, axis, dest) {
-        var x = axis[0], y = axis[1], z = axis[2];
-        var len = Math.sqrt(x*x + y*y + z*z);
-        if (!len) { return null; }
-        if (len !== 1) {
-                len = 1 / len;
-                x *= len; 
-                y *= len; 
-                z *= len;
-        }
-        
-        angle = Math.radians(angle);
-        var s = Math.sin(angle);
-        var c = Math.cos(angle);
-        var t = 1-c;
-        
-        // Cache the matrix values (makes for huge speed increases!)
-        var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3];
-        var a10 = mat[4], a11 = mat[5], a12 = mat[6], a13 = mat[7];
-        var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
-        
-        // Construct the elements of the rotation matrix
-        var b00 = x*x*t + c, b01 = y*x*t + z*s, b02 = z*x*t - y*s;
-        var b10 = x*y*t - z*s, b11 = y*y*t + c, b12 = z*y*t + x*s;
-        var b20 = x*z*t + y*s, b21 = y*z*t - x*s, b22 = z*z*t + c;
-        
-        if (!dest) { 
-                dest = mat; 
-        } else if (mat !== dest) { // If the source and destination differ, copy the unchanged last row
-                dest[12] = mat[12];
-                dest[13] = mat[13];
-                dest[14] = mat[14];
-                dest[15] = mat[15];
-        }
-        
-        // Perform rotation-specific matrix multiplication
-        dest[0] = a00*b00 + a10*b01 + a20*b02;
-        dest[1] = a01*b00 + a11*b01 + a21*b02;
-        dest[2] = a02*b00 + a12*b01 + a22*b02;
-        dest[3] = a03*b00 + a13*b01 + a23*b02;
-        
-        dest[4] = a00*b10 + a10*b11 + a20*b12;
-        dest[5] = a01*b10 + a11*b11 + a21*b12;
-        dest[6] = a02*b10 + a12*b11 + a22*b12;
-        dest[7] = a03*b10 + a13*b11 + a23*b12;
-        
-        dest[8] = a00*b20 + a10*b21 + a20*b22;
-        dest[9] = a01*b20 + a11*b21 + a21*b22;
-        dest[10] = a02*b20 + a12*b21 + a22*b22;
-        dest[11] = a03*b20 + a13*b21 + a23*b22;
-        return dest;
-};
-
 function drawWorld() {
-  //mat4rotate(mvMatrix, currentAngle, [0,1,0], mvMatrix);
-
   cubeColor = [0,1,0,1];
 
   gl.useProgram(gpuShade);
