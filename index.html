@@ -6,10 +6,6 @@
 <script id="shade_vert" type="x-shader/x-vertex">
     precision mediump float;
     
-    uniform mat4 gProjectionMatrix;
-    uniform mat4 gModelViewMatrix;
-    uniform mat4 gNormalMatrix;
-
     uniform mat3 gRotate;
     uniform vec3 gTranslate;
     
@@ -17,6 +13,20 @@
     uniform vec4 gColor;
 
     uniform float gAngleX;
+
+    mat4 viewpoint = mat4(
+      1, 0, 0, 0, 
+      0, 0.8944271802902222, 0.4472135901451111, 0, 
+      0, -0.4472135901451111, 0.8944271802902222, 0, 
+      0, 0, -4.4721360206604, 1
+    );
+
+    mat4 projection = mat4(
+      1.299038052558899, 0, 0, 0, 
+      0, 1.7320507764816284, 0, 0, 
+      0, 0, -1.0202020406723022, -1, 
+      0, 0, -0.20202019810676575, 0
+    );
     
     attribute vec3 vPosition;
     attribute vec3 vNormal;
@@ -91,8 +101,8 @@
 
         mat3 R = rotatex(gAngleX) * rotatey(gAngleX/2.0);
 
-        mat4 view = gModelViewMatrix * view4(R);
-        mat4 normal = gModelViewMatrix * transpose(inverse(R, gTranslate));
+        mat4 view = viewpoint * view4(R);
+        mat4 normal = viewpoint * transpose(inverse(R, gTranslate));
 
         eyeNorm = normalize(normal * vec4(vNormal, 0));
         eyePos  = view * vec4(vPosition, 1);        
@@ -103,7 +113,7 @@
         fColor = vec4(gColor.rgb * NdotL, 1);
         
         pos = vec4(vPosition, 1);
-        gl_Position = gProjectionMatrix * view * pos;
+        gl_Position = projection * view * pos;
     }
 </script>
 <!--
@@ -175,8 +185,6 @@ var initShaders = function()
   fShader = gpu.loadShader(gl.FRAGMENT_SHADER, "shade_frag");
   gpuShade = gpu.newProgram(vShader, fShader);
 
-  hProjectionMatrix = gl.getUniformLocation(gpuShade, "gProjectionMatrix");
-  hModelViewMatrix  = gl.getUniformLocation(gpuShade, "gModelViewMatrix");
   hNormalMatrix     = gl.getUniformLocation(gpuShade, "gNormalMatrix");
   hLightPos         = gl.getUniformLocation(gpuShade, "gLightPos");
 
@@ -309,10 +317,6 @@ function drawWorld() {
 
   gl.useProgram(gpuShade);
 
-  gl.uniformMatrix4fv(hProjectionMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(hModelViewMatrix, false, mvMatrix);
-  //gl.uniformMatrix4fv(hNormalMatrix, false, nvMatrix);
-  
   var rotationMatrix = new Float32Array([
     1, 0, 0,
     0, 1, 0,
