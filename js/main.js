@@ -7,8 +7,8 @@ function start() {
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  //gl.depthFunc(gl.LEQUAL);
-  //gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  gl.depthFunc(gl.LEQUAL);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
   initShaders();
 
@@ -58,6 +58,9 @@ var initShaders = function()
 
   T  = gl.getUniformLocation(P, "time");
   R  = gl.getUniformLocation(P, "res");
+  M  = gl.getUniformLocation(P, "matColor");
+  B  = gl.getUniformLocation(P, "basePos");
+
   vP = gl.getAttribLocation(P, "vPosition");
   vN = gl.getAttribLocation(P, "vNormal");
 };
@@ -67,18 +70,25 @@ function D()
   gl.viewport(0,0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  var time = (Date.now() - Ts) / 1000.0;
+
   gl.useProgram(P);
-
-  var time = (Date.now() - Ts) / 100.0;
-
-  gl.uniform1f(T, (Date.now() - Ts) / 1000.0);
-  gl.uniform2f(R, gl.viewportWidth, gl.viewportHeight);
 
   bind(cubeVBuf, vP);
   bind(cubeNBuf, vN);
 
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-  gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
+  gl.uniform1f(T, time);
+  
+  for (var z = -5; z < 1; z++) {
+    for (var y = -5; y < 5; y++) {
+      for (var x = -5; x < 5; x++) {
+        gl.uniform4f(M, 1, 0.5*Math.sin(x), 0.5*Math.sin(y), 1);  
+        gl.uniform3f(B, x*2, y*2, z*2);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
+        gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
+      }
+    }
+  }
 
   requestAnimationFrame(function() { D(); });
 }
