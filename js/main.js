@@ -78,16 +78,41 @@ function D()
   bind(cubeNBuf, vN);
 
   gl.uniform1f(T, time);
+
+  var start = -0;
+  var end   =  1;
+
+  if (typeof first === "undefined") {
+    first = true;
+  }
+
   
-  for (var z = -5; z < 1; z++) {
-    for (var y = -5; y < 5; y++) {
-      for (var x = -5; x < 5; x++) {
-        gl.uniform4f(M, 1, 0.5*Math.sin(x), 0.5*Math.sin(y), 1);  
+  for (var z = start; z < 1; z+=1) {
+    for (var y = start; y < end; y+=1) {
+      for (var x = start; x < end; x+=1) {
+
+        if (first) {
+          console.log("xyz: ", x, y, z);
+        } 
+
+        if (x == 0 && y == 0 && z == 0) {
+          gl.uniform4f(M, 0, 1, 0, 1);  
+        }
+        else {          
+          gl.uniform4f(M, 1, 0.5*Math.sin(x), 0.5*Math.sin(y), 1);  
+        }
+
+        /*gl.uniform3f(B, x*2, 1.0+y*2, -3.0 + z*2);*/
         gl.uniform3f(B, x*2, y*2, z*2);
+        
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
         gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
       }
     }
+  }
+
+  if (first) {
+    first = false;
   }
 
   requestAnimationFrame(function() { D(); });
