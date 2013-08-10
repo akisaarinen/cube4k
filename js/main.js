@@ -79,40 +79,22 @@ function D()
 
   gl.uniform1f(T, time);
 
-  var start = -5;
-  var end   =  5;
+  var n = 4;
+  var scale = 0.95 + 0.20*Math.sin(time);
 
-  if (typeof first === "undefined") {
-    first = true;
-  }
+  for (var z = -n; z <= n; z+=1) {
+    for (var y = -n; y <= n; y+=1) {
+      for (var x = -n; x <= n; x+=1) {
+        var xc = 0.5 + 0.5*Math.sin(Math.PI * (x-n)/(2*n));
+        var yc = 0.2 + 0.5*Math.cos(Math.PI * (y-n)/(2*n));
+        var zc = 0.1 + 0.5*Math.cos(Math.PI * (z-n)/(2*n));
 
-  
-  for (var z = start; z < 1; z+=1) {
-    for (var y = start; y < end; y+=1) {
-      for (var x = start; x < end; x+=1) {
-
-        if (first) {
-          console.log("xyz: ", x, y, z);
-        } 
-
-        if (x == 0 && y == 0 && z == 0) {
-          gl.uniform4f(M, 0, 1, 0, 1);  
-        }
-        else {          
-          gl.uniform4f(M, 1, 0.5*Math.sin(x), 0.5*Math.sin(y), 1);  
-        }
-
-        /*gl.uniform3f(B, x*2, 1.0+y*2, -3.0 + z*2);*/
-        gl.uniform3f(B, x*2, y*2, z*2);
-        
+        gl.uniform4f(M,xc,yc,zc,1);
+        gl.uniform3f(B, x*scale, y*scale, z*scale);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
         gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
       }
     }
-  }
-
-  if (first) {
-    first = false;
   }
 
   requestAnimationFrame(function() { D(); });
@@ -159,6 +141,10 @@ var cubeVerts = new Float32Array([
     -0.5,  0.5, -0.5,
     -0.5, -0.5, -0.5,
 ]);
+
+for(var i = 0; i < cubeVerts.length; i++) {
+  cubeVerts[i] = 0.5*cubeVerts[i];
+}
 
 var cubeNorms = new Float32Array([
      0,  0,  1,
