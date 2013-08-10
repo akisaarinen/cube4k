@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 DIR=`dirname $0`
-html=`ls -al $DIR/index.html | cut -d' ' -f8`
-dist=`ls -al $DIR/dist/Cube.min.js | cut -d ' ' -f8`
+
+cd $DIR
+grunt
+
+html=`ls -al index.html | cut -d' ' -f8`
+dist=`ls -al dist/Cube.min.js | cut -d ' ' -f8`
 total=$(( $html + $dist ))
 diff=$(( 4096 - $total ))
 

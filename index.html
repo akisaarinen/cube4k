@@ -4,41 +4,12 @@
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 <script id="shade_vert" type="x-shader/x-vertex">
 attribute vec3 vPosition,vNormal;
-varying vec4 C;
-uniform float X;
 varying vec3 fragmentNormal;
-mat4 projection = mat4(1.30,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
+mat4 projection = mat4(1.3,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
 uniform float time;
-
-vec3 lightPosition = vec3(0,0,5);
+vec3 lightPosition = vec3(0,0,2);
 varying vec3 lightVector;
-
-mat4 T(mat4 R) {
-  return mat4(
-      R[0][0],R[1][0],R[2][0],R[3][0],
-      R[0][1],R[1][1],R[2][1],R[3][1],
-      R[0][2],R[1][2],R[2][2],R[3][2],
-      R[0][3],R[1][3],R[2][3],R[3][3]
-  );
-}
-mat3 T(mat3 R) {
-  return mat3(
-      R[0][0],R[1][0],R[2][0],
-      R[0][1],R[1][1],R[2][1],
-      R[0][2],R[1][2],R[2][2]
-      );
-}
-mat4 I(mat3 R, vec3 t)
-{
-  mat3 Rt = T(R);
-  vec3 th = Rt*t;
-  return mat4(
-      R[0][0], R[1][0], R[2][0], 0,
-      R[0][1], R[1][1], R[2][1], 0,
-      R[0][2], R[1][2], R[2][2], 0,
-      -th[0],  -th[1],  -th[2],  1
-);
-}
+varying vec3 cameraVector;
 
 mat4 translate(vec3 pos) {
   mat4 m = mat4(1.0);
@@ -65,62 +36,94 @@ mat3 ry(float t) {
 }
 
 mat4 view(mat3 R, vec3 P) {
-  mat4 pos = mat4(1);
-  pos[3][0] = P.x;
-  pos[3][1] = P.y;
-  pos[3][2] = P.z;
-  return pos * mat4(
-      R[0][0], R[0][1], R[0][2], 0,
-      R[1][0], R[1][1], R[1][2], 0,
-      R[2][0], R[2][1], R[2][2], 0,
-      0, 0, 0, 1
+  mat4 result = mat4(mat3(R));
+  result[3] = vec4(P, 1);
+  return result;
+}
+
+mat4 transpose(mat4 m) {
+  return mat4(
+    m[0][0], m[1][0], m[2][0], m[3][0],
+    m[0][1], m[1][1], m[2][1], m[3][1],
+    m[0][2], m[1][2], m[2][2], m[3][2],
+    m[0][3], m[1][3], m[2][3], m[3][3]
   );
 }
 
 mat4 viewInv(mat3 R, vec3 P) {
-  return mat4(
-      R[0][0], R[1][0], R[2][0], 0,
-      R[0][1], R[1][1], R[2][1], 0,
-      R[0][2], R[1][2], R[2][2], 0,
-      -P.x, -P.y, -P.z, 1
+  mat3 Rt;
+  Rt = mat3(
+    R[0][0], R[1][0], R[2][0],
+    R[0][1], R[1][1], R[2][1],
+    R[0][2], R[1][2], R[2][2]
   );
+  mat4 result = mat4(Rt);
+  result[3] = vec4(-Rt * P, 1);
+  return transpose(result);
 }
 
 void main() {
-  vec3 pos = vec3(0,0,-3.0 + sin(time*1.5));
-  mat3 rot = rx(sin(time)*2.0) * ry(0.3 + cos(time*1.83));
+  float t = time * 0.3;
+  vec3 pos = vec3(0,0,-3.0 + sin(t*1.5));
+  //vec3 pos = vec3(0,0,-3.0);
+  //mat3 rot;
+  //rot = rx(sin(t)*6.0);
+  mat3 rot = ry(sin(t)*6.0);
+  //mat3 rot = ry(1.5 + 3.0*cos(t*3.0));
+  //mat3 rot = mat3(1.0);
 
-  mat4 vTransform = projection * view(rot, pos);
-  mat4 nTransform = projection * viewInv(rot, pos);
-  gl_Position    = (vTransform * vec4(vPosition, 1));
-  fragmentNormal = (vTransform * vec4(vNormal,   1)).xyz;
-  lightVector = lightPosition - vPosition;
-  C = vec4(1,0,0,1);
+  mat4 vTransform = view   (rot, pos);
+  mat4 nTransform = viewInv(rot, pos);
+
+  vec4 vPos = vTransform * vec4(vPosition, 1);
+  vec4 nPos = nTransform * vec4(-vNormal,   1);
+
+  gl_Position    = (projection * vPos);
+  fragmentNormal = (projection * nPos).xyz;
+
+  lightVector  = lightPosition - vPos.xyz;
+  cameraVector = vec3(0,0,0)   - vPos.xyz;
 }
 </script>
 <script id="shade_frag" type="x-shader/x-fragment">
 precision mediump float;
-varying vec4 C;
 uniform float time;
-uniform vec2 res;
+
 varying vec3 fragmentNormal;
 varying vec3 lightVector;
-float MAX_DIST = 7.5;
+varying vec3 cameraVector;
+
+float MAX_DIST = 6.0;
 float MAX_DIST_SQ = MAX_DIST * MAX_DIST;
-
 void main(void){
-  vec3 lightColor  = vec3(1,1,1);
+  //vec3 lightColor = vec3(sin(time),cos(time*2.0),0.5);
+  vec3 lightColor = vec3(1);
 
-  vec3 normal = normalize(fragmentNormal);
+  vec3 normal    = normalize(fragmentNormal);
+  vec3 cameraDir = normalize(cameraVector);
+  vec3 lightDir  = normalize(lightVector);
 
-  float dist = min(dot(lightVector, lightVector), MAX_DIST_SQ) / MAX_DIST_SQ;
+  float dist       = min(dot(lightVector, lightVector), MAX_DIST_SQ) / MAX_DIST_SQ;
   float distFactor = 1.0 - dist;
-
-  vec3 lightDir = normalize(lightVector);
+  
   float diffuseDot = dot(normal, lightDir);
   vec3 diffuse = lightColor * clamp(diffuseDot, 0.0, 1.0) * distFactor;
-  gl_FragColor = vec4(clamp((diffuse), 0.0, 1.0), 1);
+
+  vec3 halfAngle = normalize(cameraDir + lightDir);
+  vec3 specularColor = vec3(1,0,0);
+  float specularDot = dot(normal, halfAngle);
+  vec3 specular = specularColor * pow(clamp(specularDot, 0.0, 1.0), 20.0) * distFactor;
+
+  //gl_FragColor = vec4(clamp(specular, 0.0, 1.0), 1);
+  //gl_FragColor = vec4(specularDot, 0, 0, 1);
+  //gl_FragColor = vec4(clamp(diffuse, 0.0, 1.0), 1);
+  gl_FragColor = vec4(clamp(specular, 0.0, 1.0), 1);
+  //gl_FragColor = vec4(diffuse.x, 0, 0, 1);
+  
+  //gl_FragColor = vec4(halfAngle.z,0,0, 1);  
+  
 }</script>
+</head><body><canvas id="c" width="640" height="480"></canvas>
 <script src="js/main.js"></script>
 <!--<script src="dist/Cube.min.js"></script>-->
-</head><body onload="start()"><canvas id="c" width="640" height="480"></canvas></body></html>
+</body></html>

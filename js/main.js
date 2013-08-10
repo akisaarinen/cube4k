@@ -58,7 +58,6 @@ var initShaders = function()
 
   T  = gl.getUniformLocation(P, "time");
   R  = gl.getUniformLocation(P, "res");
-  X  = gl.getUniformLocation(P, "X");
   vP = gl.getAttribLocation(P, "vPosition");
   vN = gl.getAttribLocation(P, "vNormal");
 };
@@ -72,7 +71,6 @@ function D()
 
   var time = (Date.now() - Ts) / 100.0;
 
-  gl.uniform1f(X, A / 2.0 / Math.PI);
   gl.uniform1f(T, (Date.now() - Ts) / 1000.0);
   gl.uniform2f(R, gl.viewportWidth, gl.viewportHeight);
 
@@ -82,75 +80,23 @@ function D()
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
   gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
 
-  A += 0.45;
-  if (A > 360) {
-    A -= 360;
-  }
-
   requestAnimationFrame(function() { D(); });
 }
 
-/*
-var ur = function(v,d) {
-  var result = [];
-  var i = -1;
-  while(++i<d.length) {
-    for(var j=0;j<d[i];j++) {
-      result.push(v);
-    }
-    v=-v;
-  }
-  return result;
-}
-
-var zip3 = function(a,b,c) {
-  var x = [];
-  for (var i=0;i<a.length; i++) {
-    x.push(a[i], b[i], c[i]);
-  }
+function create(kind, verts) {
+  var x = gl.createBuffer();
+  gl.bindBuffer(kind, x);
+  gl.bufferData(kind, verts, gl.STATIC_DRAW);
+  gl.bindBuffer(kind, null);
   return x;
 }
 
-// 3173 bytes @start
-var a = ur(-.5, [2,2,4,1,1,1,1,5,1,1,1,2,2]);
-var b = ur( .5, [1,1,1,1,1,1,1,1,5,1,1,5,1,1,1,1]);
-var c = ur( .5, [4,2,2,2,4,2,2,6]);
-var cubeVerts = new Float32Array(zip3(a,b,c));
-
-var gen = function(x,y,l) {
-  var result = [];
-  for (var i=1; i <= l; i++) {
-    result.push((Math.sin(x*i) * Math.cos(y*i + 2*i)) > 0 ? -0.5 : 0.5);
-  }
-  return result;
+function bind(buffer, uniform) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.enableVertexAttribArray(uniform);
+  gl.vertexAttribPointer(uniform, 3, gl.FLOAT, false, 0, 0);
 }
 
-function deq(a,b) {
-  for(var i=0; i < a.length; i++) {
-    if (a[i] != b[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-
-var seed = 0.32;
-var incr = 2.23;
-for (var i = 0; i < 1000000; i++) {
-  var generated = gen(seed, seed, 72);
-  seed += incr;
-  if (deq(cubeVerts, generated)) {
-    console.log("found! seed: " + seed);
-    alert("found! seed: " + seed);
-    break;
-  }
-  console.log(generated.length);
-  console.log(generated);
-  break;
-}
-console.log("nope..");
-*/
 
 var cubeVerts = new Float32Array([
     -0.5,  0.5,  0.5,   // 0
@@ -215,20 +161,4 @@ var cubeIdx = new Uint16Array([
     20, 21, 22, 21, 23, 22,
 ]);
 
-function create(kind, verts) {
-  var x = gl.createBuffer();
-  gl.bindBuffer(kind, x);
-  gl.bufferData(kind, verts, gl.STATIC_DRAW);
-  gl.bindBuffer(kind, null);
-  return x;
-}
-
-function bind(buffer, uniform) {
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.enableVertexAttribArray(uniform);
-  gl.vertexAttribPointer(uniform, 3, gl.FLOAT, false, 0, 0);
-}
-
-A = 0.0;
-Ai = 0.1;
-
+start();
