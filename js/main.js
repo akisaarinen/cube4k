@@ -1,3 +1,30 @@
+
+/* Inverting matrix (for normal transformation):
+
+-      M = {
+-        {R11, R12, R13, 0},
+-        {R21, R22, R23, 0},
+-        {R31, R32, R33, 0},
+-        {tx, ty, tz, 1},
+-      };
+-
+-      Rt = {
+-        {R11, R21, R31},
+-        {R12, R22, R32},
+-        {R13, R23, R33}
+-      }
+-
+-      Rt*t = t'
+-
+-      M-1 = {
+-        {R11, R21, R31, 0},
+-        {R12, R22, R32, 0},
+-        {R13, R23, R33, 0},
+-        {-t'x, -t'y, -t'z, 1},
+-      };
+*/
+
+
 function start() {
   var canvas = document.getElementById("c");
   gl = canvas.getContext("webgl");
