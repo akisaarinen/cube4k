@@ -5,7 +5,7 @@ function start() {
   gl.viewportWidth = canvas.width;
   gl.viewportHeight = canvas.height;
 
-  //gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
   //gl.depthFunc(gl.LEQUAL);
   //gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -16,6 +16,8 @@ function start() {
   cubeNBuf = create(gl.ARRAY_BUFFER, cubeNorms);
   cubeIdxBuf = create(gl.ELEMENT_ARRAY_BUFFER, cubeIdx);
 
+  Ts = Date.now();
+
   D();
 }
 
@@ -24,11 +26,10 @@ var loadShader = function(shaderType, id) {
   var s = gl.createShader(shaderType);
   gl.shaderSource(s, src);
   gl.compileShader(s);
-  /*
   if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
     console.error("compile: '" + id + "': " + gl.getShaderInfoLog(s));
+    throw "";
   }
-  */
   return s;
 }
 
@@ -40,21 +41,23 @@ var createProgram = function(vertexId, fragmentId) {
   gl.attachShader(P,v);
   gl.attachShader(P,f);
   gl.linkProgram(P);
-  /*
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
-    console.error("link: " + gl.getProgramInfoLog(p));
+  if (!gl.getProgramParameter(P, gl.LINK_STATUS)) {
+    console.error("link: " + gl.getProgramInfoLog(P));
+    throw "";
   }
-  gl.validateProgram(p);
-  if (!gl.getProgramParameter(p, gl.VALIDATE_STATUS)) {
-    console.error("validate: " + gl.getProgramInfoLog(p));
+  gl.validateProgram(P);
+  if (!gl.getProgramParameter(P, gl.VALIDATE_STATUS)) {
+    console.error("validate: " + gl.getProgramInfoLog(P));
+    throw "";
   }
-  */
 }
 
 var initShaders = function()
 {
   createProgram("shade_vert", "shade_frag");
 
+  T  = gl.getUniformLocation(P, "time");
+  R  = gl.getUniformLocation(P, "res");
   X  = gl.getUniformLocation(P, "X");
   vP = gl.getAttribLocation(P, "vPosition");
   vN = gl.getAttribLocation(P, "vNormal");
@@ -67,7 +70,11 @@ function D()
 
   gl.useProgram(P);
 
+  var time = (Date.now() - Ts) / 100.0;
+
   gl.uniform1f(X, A / 2.0 / Math.PI);
+  gl.uniform1f(T, (Date.now() - Ts) / 1000.0);
+  gl.uniform2f(R, gl.viewportWidth, gl.viewportHeight);
 
   bind(cubeVBuf, vP);
   bind(cubeNBuf, vN);
