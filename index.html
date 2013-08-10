@@ -67,7 +67,7 @@ mat4 viewInv(mat3 R, vec3 P) {
 void main() {
   float t = time * 0.3;
 
-  vec3 lightPosition = vec3(0,4,14);
+  vec3 lightPosition = vec3(0,4,-15);
 
   vec3 objT = basePos;
   mat3 objR = rx(sin(t)*6.0) * ry(sin(t)*3.7);
@@ -101,8 +101,8 @@ float MAX_DIST    = 20.0;
 float MAX_DIST_SQ = MAX_DIST * MAX_DIST;
 vec3 AMBIENT      = vec3(0.1);
 void main(void){
-  vec3 lightColor    = vec3(1);
-  vec3 specularColor = max(lightColor + 0.5, 1.0);
+  vec3 dfColor = vec3(1);
+  vec3 sfColor = max(dfColor + 0.5, 1.0);
 
   vec3 C = normalize(cameraVector);
   vec3 N = normalize(fragmentNormal);
@@ -115,9 +115,8 @@ void main(void){
   float df = max(0.0, dot(N, L));
   float sf = max(0.0, dot(N, H));
   
-  vec3 diffuse = lightColor*df*distF;
-  vec3 specular = specularColor * pow(sf, 16.0) * distF;
-
+  vec3 diffuse  = dfColor*df*distF;
+  vec3 specular = sfColor*pow(sf, 16.0)*distF;
   gl_FragColor = vec4(clamp(matColor.rgb * (diffuse + AMBIENT) +specular, 0.0, 1.0), matColor.a);    
 }</script>
 </head><body><canvas id="c" width="1024" height="768"></canvas>

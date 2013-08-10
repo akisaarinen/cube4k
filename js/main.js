@@ -79,8 +79,8 @@ function D()
 
   gl.uniform1f(T, time);
 
-  var start = -0;
-  var end   =  1;
+  var start = -5;
+  var end   =  5;
 
   if (typeof first === "undefined") {
     first = true;
