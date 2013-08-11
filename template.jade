@@ -1,6 +1,4 @@
-html
-  body
-    canvas(id="c", width="640", height="480")
-    != "<script id='v' type='x'>" + vertexShader + "</script>"      
-    != "<script id='f' type='x'>" + fragmentShader + "</script>"      
-    != "<script>" + javaScript + "</script>"
+canvas(id="c", width="640", height="480")
+!= "<script id='v' type='x'>" + vertexShader + "</script>"
+!= "<script id='f' type='x'>" + fragmentShader + "</script>"
+!= "<script>" + javaScript + "</script>"
