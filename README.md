@@ -19,6 +19,7 @@ seems to be way more setups where it doesn't work than where it does.
 Here are two screenshots what it should look like:
 
 ![Cubes1!](https://raw.github.com/akisaarinen/cube4k/master/screenshots/cubes1.png)
+
 ![Cubes2!](https://raw.github.com/akisaarinen/cube4k/master/screenshots/cubes2.png)
 
 Running the development version
