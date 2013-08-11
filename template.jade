@@ -1,8 +1,6 @@
 html
   body
     canvas(id="c", width="640", height="480")
-    script(type="x-shader/x-vertex", id="v")
-      = vertexShader
-    script(type="x-shader/x-fragment", id="f")
-      = fragmentShader      
+    != "<script id='v' type='x'>" + vertexShader + "</script>"      
+    != "<script id='f' type='x'>" + fragmentShader + "</script>"      
     != "<script>" + javaScript + "</script>"

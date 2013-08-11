@@ -1,4 +1,5 @@
-attribute vec3 vPosition,vNormal;
+attribute vec3 vPosition;
+attribute vec3 vNormal;
 varying vec3 fragmentNormal;
 mat4 projection = mat4(1.3,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
 

@@ -1,21 +1,12 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      options: {
-        separator: ';'
-      },
-      dist: {
-        src: ['js/*.js'],
-        dest: 'build/app.js'
-      }
-    },
     uglify: {
       options: {
       },
       dist: {
         files: {
-          'build/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+          'build/<%= pkg.name %>.min.js': ['js/main.js']
         }
       }
     },
@@ -25,8 +16,8 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      files: ['js/*.js'],
-      tasks: ['concat', 'uglify']
+      files: ['js/*', 'shader/*', 'template.jade'],
+      tasks: ['default']
     }
   });
 
@@ -35,5 +26,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-exec');
 
-  grunt.registerTask('default', ['concat', 'uglify', 'exec']);
+  grunt.registerTask('default', ['uglify', 'exec']);
 };

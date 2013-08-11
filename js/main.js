@@ -9,9 +9,7 @@ function s() {
   var gl     = canvas.getContext("webgl");
 
   var loadShader = function(shaderType, id) {
-    src = document.getElementById(id).textContent;
-    console.log(src);
-    console.log("src: " + src);
+    var src = document.getElementById(id).textContent;
     var shader = gl.createShader(shaderType);
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
@@ -59,6 +57,8 @@ function s() {
   var gl_bindBuffer = function(kind, buffer) {
     gl.bindBuffer(kind, buffer);
   }
+  var gl_ELEMENT_ARRAY_BUFFER = gl.ELEMENT_ARRAY_BUFFER;
+  var gl_ARRAY_BUFFER         = gl.ARRAY_BUFFER;
 
   var initShaders = function()
   {
@@ -81,7 +81,7 @@ function s() {
   }
 
   var bindBuffer = function(buffer, uniformLocation) {
-    gl_bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl_bindBuffer(gl_ARRAY_BUFFER, buffer);
     gl.enableVertexAttribArray(uniformLocation);
     gl.vertexAttribPointer(uniformLocation, 3, gl.FLOAT, false, 0, 0);
   }
@@ -111,7 +111,7 @@ function s() {
 
           gl.uniform4f(M, xc, yc, zc, 1);
           gl.uniform3f(B, x*scale, y*scale, z*scale);
-          gl_bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
+          gl_bindBuffer(gl_ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
           gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
         }
       }
@@ -188,9 +188,9 @@ function s() {
 
   /* Initialize buffers */
   var program;
-  var cubeVBuf   = create(gl.ARRAY_BUFFER, cubeVerts);
-  var cubeNBuf   = create(gl.ARRAY_BUFFER, cubeNorms);
-  var cubeIdxBuf = create(gl.ELEMENT_ARRAY_BUFFER, cubeIdx);  
+  var cubeVBuf   = create(gl_ARRAY_BUFFER, cubeVerts);
+  var cubeNBuf   = create(gl_ARRAY_BUFFER, cubeNorms);
+  var cubeIdxBuf = create(gl_ELEMENT_ARRAY_BUFFER, cubeIdx);  
 
   /* Initialize shaders */
   initShaders();
@@ -198,10 +198,9 @@ function s() {
   /* Setup WebGL */
   gl.viewportWidth  = canvas.width;
   gl.viewportHeight = canvas.height;
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0, 0, 0, 1);
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
-  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
   /* Run */
   var startTime = Date.now(); 
