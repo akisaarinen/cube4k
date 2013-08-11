@@ -9,7 +9,9 @@ function s() {
   var gl     = canvas.getContext("webgl");
 
   var loadShader = function(shaderType, id) {
-    var src = document.getElementById(id).textContent;
+    src = document.getElementById(id).textContent;
+    console.log(src);
+    console.log("src: " + src);
     var shader = gl.createShader(shaderType);
     gl.shaderSource(shader, src);
     gl.compileShader(shader);

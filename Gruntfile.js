@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['js/*.js'],
-        dest: 'dist/app.js'
+        dest: 'build/app.js'
       }
     },
     uglify: {
@@ -15,8 +15,13 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+          'build/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
         }
+      }
+    },
+    exec: {
+      jade_minify: {
+        command: './compile.js'
       }
     },
     watch: {
@@ -28,7 +33,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-exec');
 
-  grunt.registerTask('default', ['concat', 'uglify']);
-
+  grunt.registerTask('default', ['concat', 'uglify', 'exec']);
 };

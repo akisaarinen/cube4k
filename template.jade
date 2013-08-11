@@ -1,0 +1,8 @@
+html
+  body
+    canvas(id="c", width="640", height="480")
+    script(type="x-shader/x-vertex", id="v")
+      = vertexShader
+    script(type="x-shader/x-fragment", id="f")
+      = fragmentShader      
+    != "<script>" + javaScript + "</script>"
