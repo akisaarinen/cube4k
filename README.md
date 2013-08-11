@@ -8,7 +8,7 @@ the size any more after getting it below the magic 4k :-)
 Demo
 ----
 
-A demo is available here: http://akisaarinen.fi/webgl/cube4k.min.html
+A demo is available here: http://akisaarinen.fi/cube4k/
 
 It has only been tested with OS X 10.7.5 and Chrome 28.0.1500.95.
 
