@@ -54,7 +54,7 @@ var createProgram = function(vertexId, fragmentId) {
 
 var initShaders = function()
 {
-  createProgram("shade_vert", "shade_frag");
+  createProgram("v", "f");
 
   T  = gl.getUniformLocation(P, "time");
   R  = gl.getUniformLocation(P, "res");

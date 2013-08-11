@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-<script id="shade_vert" type="x-shader/x-vertex">
+<script id="v" type="x-shader/x-vertex">
 attribute vec3 vPosition,vNormal;
 varying vec3 fragmentNormal;
 mat4 projection = mat4(1.3,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
@@ -90,7 +90,7 @@ void main() {
   cameraVector = worldT        - oVertex.xyz;
 }
 </script>
-<script id="shade_frag" type="x-shader/x-fragment">
+<script id="f" type="x-shader/x-fragment">
 precision mediump float;
 uniform float time;
 uniform vec4 matColor;
