@@ -8,7 +8,7 @@ the size any more after getting it below the magic 4k :-)
 Demo
 ----
 
-A demo is available here: http://akisaarinen.fi/webgl/cube.min.html
+A demo is available here: http://akisaarinen.fi/webgl/cube4k.min.html
 
 It has only been tested with OS X 10.7.5 and Chrome 28.0.1500.95.
 
@@ -50,7 +50,7 @@ Compiling minified version
 
         grunt
 
-Result should appear to `cube.min.html`, and it should work exactly
+Result should appear to `cube4k.min.html`, and it should work exactly
 as `development.html` except it's smaller and everything is included
 in a single file. Note, however, that the compression to a single file
 has several steps and tools. It's likely that something will break

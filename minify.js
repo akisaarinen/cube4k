@@ -11,9 +11,9 @@ var inputFragmentShader = "shader/fragment.glsl";
 
 var inputMinifiedVertex   = "build/vertex.min.glsl";
 var inputMinifiedFragment = "build/fragment.min.glsl";
-var inputJavaScript 	  = "build/Cube.min.js";
+var inputJavaScript 	  = "build/cube4k.min.js";
 
-var output = "cube.min.html";
+var output = "cube4k.min.html";
 
 // First, concatenate both of the shader files (they need to be minified together), 
 // and add preprocessing directives to the GLSL compiler.

@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     },
     exec: {
       jade_minify: {
-        command: './compile.js'
+        command: './minify.js'
       }
     },
     watch: {
