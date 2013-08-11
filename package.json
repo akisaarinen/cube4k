@@ -1,14 +1,10 @@
 {
-  "name": "Cube",
+  "name": "cube4k",
   "version": "0.0.1",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "A very simple 4k WebGL demo with spinning cubes",
   "repository": {
     "type": "git",
-    "url": "todo"
+    "url": "https://github.com/akisaarinen/cube4k"
   },
   "author": "Aki Saarinen",
   "dependencies": {
@@ -16,7 +12,6 @@
     "glsl-unit": "~0.0.7",
     "grunt": "~0.4.1",
     "grunt-exec": "~0.4.2",
-    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-watch": "~0.5.1",
     "grunt-contrib-uglify": "~0.2.2"
   }
