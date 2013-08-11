@@ -14,12 +14,12 @@ function s() {
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
 
-    /* BEGIN: comment out for minified build */
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error("compile: '" + id + "': " + gl.getShaderInfoLog(shader));
-      throw "";
+    if (DEBUG) {
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error("compile: '" + id + "': " + gl.getShaderInfoLog(shader));
+        throw "";
+      }
     }
-    /* END */
     return shader;
   }
 
@@ -32,19 +32,19 @@ function s() {
     gl.attachShader(program,fragment);
     gl.linkProgram(program);
 
-    /* BEGIN: comment out for minified build */
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      var error = "link: " + gl.getProgramInfoLog(program);
-      console.error(error);
-      throw error;
+    if (DEBUG) {
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        var error = "link: " + gl.getProgramInfoLog(program);
+        console.error(error);
+        throw error;
+      }
+      gl.validateProgram(program);
+      if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
+        var error = "validate: " + gl.getProgramInfoLog(program);
+        console.error(error);
+        throw error;
+      }
     }
-    gl.validateProgram(program);
-    if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-      var error = "validate: " + gl.getProgramInfoLog(program);
-      console.error(error);
-      throw error;
-    }
-    /* END */
   }
 
   /* OpenGL wrappers to enable better minified compression.
