@@ -4,12 +4,16 @@ function s() {
   var cos = Math.cos;
   var PI  = Math.PI;
 
-  /* Initialize canvas */  
-  var canvas = document.getElementById("c");
+  var getElementById = function(el) {
+    return document.getElementById(el);
+  }
+
+    /* Initialize canvas */  
+  var canvas = getElementById("c");
   var gl     = canvas.getContext("webgl");
 
   var loadShader = function(shaderType, id) {
-    var src = document.getElementById(id).textContent;
+    var src = getElementById(id).textContent;
     var shader = gl.createShader(shaderType);
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
@@ -102,14 +106,14 @@ function s() {
     var n     = 4;
     var scale = 0.95 + 0.20*sin(time);
 
-    for (var z = -n; z <= n; z+=1) {
-      for (var y = -n; y <= n; y+=1) {
-        for (var x = -n; x <= n; x+=1) {
-          var xc = 0.5 + 0.5*sin(PI * (x-n)/(2*n));
-          var yc = 0.2 + 0.5*cos(PI * (y-n)/(2*n));
-          var zc = 0.1 + 0.5*cos(PI * (z-n)/(2*n));
-
-          gl.uniform4f(M, xc, yc, zc, 1);
+    for (z = -n; z <= n; z+=1) {
+      for (y = -n; y <= n; y+=1) {
+        for (x = -n; x <= n; x+=1) {
+          gl.uniform4f(M, 
+            0.5 + 0.5*sin(PI * (x-n)/(2*n)), 
+            0.2 + 0.5*cos(PI * (y-n)/(2*n)), 
+            0.1 + 0.5*cos(PI * (z-n)/(2*n)), 
+            1);
           gl.uniform3f(B, x*scale, y*scale, z*scale);
           gl_bindBuffer(gl_ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
           gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
@@ -186,6 +190,38 @@ function s() {
       20, 21, 22, 21, 23, 22,
   ]);
 
+  /* Music */
+
+  function dubstep(t) {
+    return (t&t>>8)%256+(t>>4)+(t>>7);
+  }
+  function beat(t) {
+    return t*(5186>>(t>>9&14)&15);
+  }
+  function dumdidum(t, shift) {
+    return t*(5188>>(t>>9&14)&15)+(t>>shift)
+  }
+  function start(t) {
+    return t*(((t>>12)|(t>>11)))
+  }
+  function silence(t) {
+    return 0;
+  }
+  function toHex(value) {
+    var hex = value.toString(16);
+    if (value < 16) hex = "0" + hex;
+    return "%" + hex;
+  }
+      
+  function addSound(x, t0, len, f) {
+    var freq = 11025;
+    for (t = 0; t < freq*len; t++) {
+      var value = (f(t+t0*freq,x) & 0xff) * 256;
+      S += toHex(0xff & value);
+      S += toHex((0xff00 & value)>>8);
+    }
+  };
+
   /* Initialize buffers */
   var program;
   var cubeVBuf   = create(gl_ARRAY_BUFFER, cubeVerts);
@@ -202,8 +238,20 @@ function s() {
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
 
-  /* Run */
-  var startTime = Date.now(); 
+  /* Create "music" :) */
+  S = "data:audio/x-wav,%52%49%46%46%84%75%0d%00%57%41%56%45%66%6d%74%20%10%00%00%00%01%00%01%00%11%2b%00%00%22%56%00%00%02%00%10%00%64%61%74%61%f8%2f%14%00";
+
+  addSound(0.0, 0.0, 1.6, start);
+  addSound(0.0, 0.0, 4.0, beat);  
+  addSound(1.0, 0.0, 2.6, dumdidum);  
+  addSound(0.0, 0.0, 4.0, beat);  
+  addSound(0.0, 2.5, 3.0, dubstep);
+  addSound(0.0, 0.0, 2.0, silence);
+
+  getElementById("a").src = S;
+
+  /* Run graphics */
+  var startTime = Date.now();
   draw();
 }
 s();
