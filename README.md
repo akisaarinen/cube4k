@@ -1,9 +1,10 @@
 Spinning cubes WebGL 4k demo.
 
 Nothing fancy, this is my first attempt at doing something fun with WebGL
-and shaders. Minified version is currently 3615 bytes, and there's
-actually quite much fat left there. Didn't bother optimizing
-the size any more after getting it below the magic 4k :-)
+and shaders. Also contains simple bytebeat music.
+
+Minified version is currently 4091 bytes, and there's lots of fat left there.
+Below 4k is good enough for me at this stage :)
 
 Demo
 ----
