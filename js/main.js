@@ -210,8 +210,7 @@ function s() {
   }
   function toHex(value) {
     var hex = value.toString(16);
-    if (value < 16) hex = "0" + hex;
-    return "%" + hex;
+    return (value < 16) ? "%0" + hex : "%" + hex;
   }
       
   function addSound(x, i0, len, f) {
