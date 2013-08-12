@@ -65,10 +65,10 @@ void main() {
   float t = T * 5.;
   float d = 3.0;
 
-  vec3 lightPosition = vec3(0, 0.0, -15.0);
+  vec3 lightPosition = vec3(0, 0, -15);
 
   vec3 objT = B;
-  mat3 objR = rx(sin(t*0.1)*6.0) * ry(sin(t*0.1)*3.7);
+  mat3 objR = rx(sin(t*0.1)*6.0) * ry(sin(t*.1)*3.7);
 
   vec3 worldT = vec3(0,0,-12.0);
   mat3 worldR = ry(3.0*sin(t/6.0)) * rx(3.0*sin(t/5.0));

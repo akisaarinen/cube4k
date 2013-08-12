@@ -109,11 +109,11 @@ function s() {
     for (z = -n; z <= n; z+=1) {
       for (y = -n; y <= n; y+=1) {
         for (x = -n; x <= n; x+=1) {
-          gl.uniform4f(M, 
+          gl.uniform3f(M, 
             0.5,
             0.2 + 0.5*cos(PI * (y-n)/(2*n)), 
-            0.1 + 0.5*cos(PI * (z-n)/(2*n)), 
-            1);
+            0.1 + 0.5*cos(PI * (z-n)/(2*n))
+          );
           gl.uniform3f(B, x*scale, y*scale, z*scale);
           gl_bindBuffer(gl_ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
           gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
@@ -210,7 +210,7 @@ function s() {
   }
   function toHex(value) {
     var hex = value.toString(16);
-    return (value < 16) ? "%0" + hex : "%" + hex;
+    return "%" + ((value < 16) ? "0" + hex : hex);
   }
       
   function addSound(x, i0, len, f) {
