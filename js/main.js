@@ -110,7 +110,7 @@ function s() {
       for (y = -n; y <= n; y+=1) {
         for (x = -n; x <= n; x+=1) {
           gl.uniform4f(M, 
-            0.5 + 0.5*sin(PI * (x-n)/(2*n)), 
+            0.5,
             0.2 + 0.5*cos(PI * (y-n)/(2*n)), 
             0.1 + 0.5*cos(PI * (z-n)/(2*n)), 
             1);
