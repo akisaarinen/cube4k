@@ -4,7 +4,7 @@ function s() {
   var cos = Math.cos;
   var PI  = Math.PI;
 
-  var getElementById = function(el) {
+  function getElementById(el) {
     return document.getElementById(el);
   }
 
@@ -12,7 +12,7 @@ function s() {
   var canvas = getElementById("c");
   var gl     = canvas.getContext("webgl");
 
-  var loadShader = function(shaderType, id) {
+  function loadShader(shaderType, id) {
     var src = getElementById(id).textContent;
     var shader = gl.createShader(shaderType);
     gl.shaderSource(shader, src);
@@ -27,7 +27,7 @@ function s() {
     return shader;
   }
 
-  var createProgram = function(vertexId, fragmentId) {
+  function createProgram(vertexId, fragmentId) {
     var vertex   = loadShader(gl.VERTEX_SHADER,   vertexId);
     var fragment = loadShader(gl.FRAGMENT_SHADER, fragmentId);
 
@@ -55,16 +55,16 @@ function s() {
      This way these can be renamed to one or two letter functions,
      unlike gl.* because they can not be renamed. Usually worth it if
      there are over 2 invocations. */
-  var gl_uniformLocation = function(variable) {
+  function gl_uniformLocation(variable) {
     return gl.getUniformLocation(program, variable);
   }
-  var gl_bindBuffer = function(kind, buffer) {
+  function gl_bindBuffer(kind, buffer) {
     gl.bindBuffer(kind, buffer);
   }
   var gl_ELEMENT_ARRAY_BUFFER = gl.ELEMENT_ARRAY_BUFFER;
   var gl_ARRAY_BUFFER         = gl.ARRAY_BUFFER;
 
-  var initShaders = function()
+  function initShaders()
   {
     createProgram("v", "f");
 
@@ -76,7 +76,7 @@ function s() {
     N = gl.getAttribLocation(program, "vNormal");
   };
 
-  var create = function(kind, verts) {
+  function create(kind, verts) {
     var x = gl.createBuffer();
     gl_bindBuffer(kind, x);
     gl.bufferData(kind, verts, gl.STATIC_DRAW);
@@ -84,13 +84,13 @@ function s() {
     return x;
   }
 
-  var bindBuffer = function(buffer, uniformLocation) {
+  function bindBuffer(buffer, uniformLocation) {
     gl_bindBuffer(gl_ARRAY_BUFFER, buffer);
     gl.enableVertexAttribArray(uniformLocation);
     gl.vertexAttribPointer(uniformLocation, 3, gl.FLOAT, false, 0, 0);
   }
 
-  var draw = function()
+  function draw()
   {
     var time = (Date.now() - startTime) / 1000.0;
 
