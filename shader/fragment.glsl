@@ -1,6 +1,5 @@
 precision mediump float;
-uniform float time;
-uniform vec4 matColor;
+uniform vec4 M;
 
 varying vec3 fragmentNormal;
 varying vec3 lightVector;
@@ -27,5 +26,5 @@ void main(void){
   
   vec3 diffuse  = dfColor*df*distF;
   vec3 specular = sfColor*pow(sf, 16.0)*distF;
-  gl_FragColor = vec4(clamp(matColor.rgb * (diffuse + AMBIENT) + specular, 0.0, 1.0), matColor.a);    
+  gl_FragColor = vec4(clamp(M.rgb * (diffuse + AMBIENT) + specular, 0.0, 1.0), M.a);
 }

@@ -1,13 +1,14 @@
-attribute vec3 vPosition;
-attribute vec3 vNormal;
-varying vec3 fragmentNormal;
-mat4 projection = mat4(1.3,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
+uniform float T;
+uniform vec3  B;
 
-uniform float time;
-uniform vec3 basePos;
+attribute vec3 P;
+attribute vec3 N;
 
 varying vec3 lightVector;
 varying vec3 cameraVector;
+varying vec3 fragmentNormal;
+
+mat4 projection = mat4(1.3,0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-.2,0);
 
 mat4 translate(vec3 pos) {
   mat4 m = mat4(1.0);
@@ -61,19 +62,19 @@ mat4 viewInv(mat3 R, vec3 P) {
 }
 
 void main() {
-  float t = time * 5.;
+  float t = T * 5.;
   float d = 3.0;
 
   vec3 lightPosition = vec3(0, 0.0, -15.0);
 
-  vec3 objT = basePos;
+  vec3 objT = B;
   mat3 objR = rx(sin(t*0.1)*6.0) * ry(sin(t*0.1)*3.7);
 
   vec3 worldT = vec3(0,0,-12.0);
   mat3 worldR = ry(3.0*sin(t/6.0)) * rx(3.0*sin(t/5.0));
 
-  vec4 oVertex = view   (objR, objT) * vec4(vPosition, 1);
-  vec4 oNormal = viewInv(objR, objT) * vec4(vNormal,  1);
+  vec4 oVertex = view   (objR, objT) * vec4(P, 1);
+  vec4 oNormal = viewInv(objR, objT) * vec4(N,  1);
 
   vec4 wVertex = view   (worldR, worldT) * oVertex;
   vec4 wNormal = viewInv(worldR, worldT) * oNormal;

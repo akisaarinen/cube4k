@@ -68,12 +68,12 @@ function s() {
   {
     createProgram("v", "f");
 
-    T = gl_uniformLocation("time");
-    M = gl_uniformLocation("matColor");
-    B = gl_uniformLocation("basePos");
+    T = gl_uniformLocation("T");
+    M = gl_uniformLocation("M");
+    B = gl_uniformLocation("B");
 
-    P = gl.getAttribLocation(program, "vPosition");
-    N = gl.getAttribLocation(program, "vNormal");
+    P = gl.getAttribLocation(program, "P");
+    N = gl.getAttribLocation(program, "N");
   };
 
   function create(kind, verts) {
@@ -152,9 +152,10 @@ function s() {
       -0.5, -0.5, -0.5,
   ]);
   // Scale down
-  for(var i = 0; i < 72; i++) {
+  for(i = 0; i < 72; i++) {
     cubeVerts[i] = 0.5*cubeVerts[i];
   }
+  
   var cubeNorms = new Float32Array([
        0,  0,  1,
        0,  0,  1,
