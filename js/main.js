@@ -214,10 +214,10 @@ function s() {
     return "%" + hex;
   }
       
-  function addSound(x, t0, len, f) {
+  function addSound(x, i0, len, f) {
     var freq = 11025;
-    for (t = 0; t < freq*len; t++) {
-      var value = (f(t+t0*freq,x) & 0xff) * 256;
+    for (i = 0; i < freq*len; i++) {
+      var value = (f(i+i0*freq,x) & 0xff) * 256;
       S += toHex(0xff & value);
       S += toHex((0xff00 & value)>>8);
     }
