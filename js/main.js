@@ -116,7 +116,7 @@ function s() {
             1);
           gl.uniform3f(B, x*scale, y*scale, z*scale);
           gl_bindBuffer(gl_ELEMENT_ARRAY_BUFFER, cubeIdxBuf);
-          gl.drawElements(gl.TRIANGLES, cubeIdx.length, gl.UNSIGNED_SHORT, 0);
+          gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
         }
       }
     }
@@ -152,7 +152,7 @@ function s() {
       -0.5, -0.5, -0.5,
   ]);
   // Scale down
-  for(var i = 0; i < cubeVerts.length; i++) {
+  for(var i = 0; i < 72; i++) {
     cubeVerts[i] = 0.5*cubeVerts[i];
   }
   var cubeNorms = new Float32Array([
